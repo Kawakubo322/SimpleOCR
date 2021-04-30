@@ -1,6 +1,7 @@
 import logging
 import os
 import sys
+import re
 
 import click
 import pyocr
@@ -8,13 +9,19 @@ from PIL import Image
 
 
 @click.command()
-@click.option('--input', help='input file')
+@click.option('--input', help='input file (png, jpg, pdf)')
 @click.option('--output', help='output file (.txt)')
 @click.option('--verbose', is_flag=True, help='output detailed logs')
 def func(input, output, verbose):
+    if not input or not output:
+        logger.error("Invalid command.")
+        sys.exit(1)
     filepath = input
     if not os.path.exists(filepath):
-        logger.error("Input file doesn't exist")
+        logger.error("Input file doesn't exist.")
+        sys.exit(1)
+    if not re.match(r'([a-zA-Z0-9]+)\.txt', output):
+        logger.error("Invalid output file.")
         sys.exit(1)
     img = Image.open(filepath)
     tools = pyocr.get_available_tools()
